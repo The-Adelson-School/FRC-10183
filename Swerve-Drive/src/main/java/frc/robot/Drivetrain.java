@@ -1,86 +1,87 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-package frc.robot;
-
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+// Import relevant classes.
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/** Represents a swerve drive style drivetrain. */
-public class Drivetrain {
-  public static final double kMaxSpeed = 3.0; // 3 meters per second
-  public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
-  private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
-  private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
-  private final Translation2d m_backLeftLocation = new Translation2d(-0.381, 0.381);
-  private final Translation2d m_backRightLocation = new Translation2d(-0.381, -0.381);
 
-  private final SwerveModule m_frontLeft = new SwerveModule(1, 2, 0, 1, 2, 3);
-  private final SwerveModule m_frontRight = new SwerveModule(3, 4, 4, 5, 6, 7);
-  private final SwerveModule m_backLeft = new SwerveModule(5, 6, 8, 9, 10, 11);
-  private final SwerveModule m_backRight = new SwerveModule(7, 8, 12, 13, 14, 15);
+// Example SwerveDrive class
+public class SwerveDrive extends SubsystemBase
+{
 
-  private final AnalogGyro m_gyro = new AnalogGyro(0);
+    // Attributes
+    SwerveDriveKinematics kinematics;
+    SwerveDriveOdometry   odometry;
+    Gyroscope             gyro; // Psuedo-class representing a gyroscope.
+    SwerveModule[]        swerveModules; // Psuedo-class representing swerve modules.
+    
+    // Constructor
+    public SwerveDrive() 
+    {
+    
+        swerveModules = new SwerveModule[4]; // Psuedo-code; Create swerve modules here.
+        
+        // Create SwerveDriveKinematics object
+        // 12.5in from center of robot to center of wheel.
+        // 12.5in is converted to meters to work with object.
+        // Translation2d(x,y) == Translation2d(front, left)
+        kinematics = new SwerveDriveKinematics(
+            new Translation2d(Units.inchesToMeters(12.5), Units.inchesToMeters(12.5)), // Front Left
+            new Translation2d(Units.inchesToMeters(12.5), Units.inchesToMeters(-12.5)), // Front Right
+            new Translation2d(Units.inchesToMeters(-12.5), Units.inchesToMeters(12.5)), // Back Left
+            new Translation2d(Units.inchesToMeters(-12.5), Units.inchesToMeters(-12.5))  // Back Right
+        );
+        
+        gyro = new Gyroscope(); // Psuedo-constructor for generating gyroscope.
 
-  private final SwerveDriveKinematics m_kinematics =
-      new SwerveDriveKinematics(
-          m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
-
-  private final SwerveDriveOdometry m_odometry =
-      new SwerveDriveOdometry(
-          m_kinematics,
-          m_gyro.getRotation2d(),
-          new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_backLeft.getPosition(),
-            m_backRight.getPosition()
-          });
-
-  public Drivetrain() {
-    m_gyro.reset();
-  }
-
-  /**
-   * Method to drive the robot using joystick info.
-   *
-   * @param xSpeed Speed of the robot in the x direction (forward).
-   * @param ySpeed Speed of the robot in the y direction (sideways).
-   * @param rot Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
-   */
-  public void drive(
-      double xSpeed, double ySpeed, double rot, boolean fieldRelative, double periodSeconds) {
-    var swerveModuleStates =
-        m_kinematics.toSwerveModuleStates(
-            ChassisSpeeds.discretize(
-                fieldRelative
-                    ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                        xSpeed, ySpeed, rot, m_gyro.getRotation2d())
-                    : new ChassisSpeeds(xSpeed, ySpeed, rot),
-                periodSeconds));
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_backLeft.setDesiredState(swerveModuleStates[2]);
-    m_backRight.setDesiredState(swerveModuleStates[3]);
-  }
-
-  /** Updates the field relative position of the robot. */
-  public void updateOdometry() {
-    m_odometry.update(
-        m_gyro.getRotation2d(),
-        new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_backLeft.getPosition(),
-          m_backRight.getPosition()
-        });
-  }
+        // Create the SwerveDriveOdometry given the current angle, the robot is at x=0, r=0, and heading=0
+        odometry = new SwerveDriveOdometry(
+            kinematics,
+            gyro.getAngle(), // returns current gyro reading as a Rotation2d
+            new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition},
+            // Front-Left, Front-Right, Back-Left, Back-Right
+            new Pose2d(0,0,new Rotation2d()) // x=0, y=0, heading=0
+        );
+            
+    }
+    
+    // Simple drive function
+    public void drive()
+    {
+        // Create test ChassisSpeeds going X = 14in, Y=4in, and spins at 30deg per second.
+        ChassisSpeeds testSpeeds = new ChassisSpeeds(Units.inchesToMeters(14), Units.inchesToMeters(4), Units.degreesToRadians(30));
+        
+        // Get the SwerveModuleStates for each module given the desired speeds.
+        SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(testSpeeds);
+        // Output order is Front-Left, Front-Right, Back-Left, Back-Right
+        
+        swerveModules[0].setState(swerveModuleStates[0]);
+        swerveModules[1].setState(swerveModuleStates[1]);
+        swerveModules[2].setState(swerveModuleStates[2]);
+        swerveModules[3].setState(swerveModuleStates[3]);
+    }
+    
+    // Fetch the current swerve module positions.
+    public SwerveModulePosition[] getCurrentSwerveModulePositions()
+    {
+        return new SwerveModulePosition[]{
+            new SwerveModulePosition(swerveModules[0].getDistance(), swerveModules[0].getAngle()), // Front-Left
+            new SwerveModulePosition(swerveModules[1].getDistance(), swerveModules[1].getAngle()), // Front-Right
+            new SwerveModulePosition(swerveModules[2].getDistance(), swerveModules[2].getAngle()), // Back-Left
+            new SwerveModulePosition(swerveModules[3].getDistance(), swerveModules[3].getAngle())  // Back-Right
+        };
+    }
+    
+    @Override
+    public void periodic()
+    {
+        // Update the odometry every run.
+        odometry.update(gyro.getAngle(),  getCurrentSwerveModulePositions());
+    }
+    
 }
