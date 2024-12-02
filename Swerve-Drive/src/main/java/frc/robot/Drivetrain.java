@@ -24,7 +24,7 @@ public class SwerveDrive extends SubsystemBase
     public SwerveDrive() 
     {
     
-        swerveModules = new SwerveModule[4]; // Psuedo-code; Create swerve modules here.
+        swerveModules = new SwerveModule[SwerveModule(int 1, int 11, int 12), SwerveModule(int 4, int 41, int 42), SwerveModule(int 2, int 21, int 22), SwerveModule(int 3, int 31, int 32)]; // Psuedo-code; Create swerve modules here.
         
         // Create SwerveDriveKinematics object
         // 12.5in from center of robot to center of wheel.
@@ -43,7 +43,7 @@ public class SwerveDrive extends SubsystemBase
         odometry = new SwerveDriveOdometry(
             kinematics,
             gyro.getAngle(), // returns current gyro reading as a Rotation2d
-            new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition},
+            new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()},
             // Front-Left, Front-Right, Back-Left, Back-Right
             new Pose2d(0,0,new Rotation2d()) // x=0, y=0, heading=0
         );
