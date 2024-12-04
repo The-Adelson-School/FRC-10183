@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 
 
@@ -17,7 +18,7 @@ public class SwerveDrive extends SubsystemBase
     // Attributes
     SwerveDriveKinematics kinematics;
     SwerveDriveOdometry   odometry;
-    Gyroscope             gyro; // Psuedo-class representing a gyroscope.
+    WPI_PigeonIMU             gyro; // Psuedo-class representing a gyroscope.
     SwerveModule[]        swerveModules; // Psuedo-class representing swerve modules.
     
     // Constructor
@@ -37,12 +38,12 @@ public class SwerveDrive extends SubsystemBase
             new Translation2d(Units.inchesToMeters(-12.5), Units.inchesToMeters(-12.5))  // Back Right
         );
         
-        gyro = new Gyroscope(); // Psuedo-constructor for generating gyroscope.
+        gyro = new WPI_PigeonIMU(5); // Psuedo-constructor for generating gyroscope.
 
         // Create the SwerveDriveOdometry given the current angle, the robot is at x=0, r=0, and heading=0
         odometry = new SwerveDriveOdometry(
             kinematics,
-            gyro.getAngle(), // returns current gyro reading as a Rotation2d
+            gyro.getRotation2D(), // returns current gyro reading as a Rotation2d
             new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()},
             // Front-Left, Front-Right, Back-Left, Back-Right
             new Pose2d(0,0,new Rotation2d()) // x=0, y=0, heading=0
@@ -81,7 +82,7 @@ public class SwerveDrive extends SubsystemBase
     public void periodic()
     {
         // Update the odometry every run.
-        odometry.update(gyro.getAngle(),  getCurrentSwerveModulePositions());
+        odometry.update(gyro.getRotation2D(),  getCurrentSwerveModulePositions());
     }
     
 }
