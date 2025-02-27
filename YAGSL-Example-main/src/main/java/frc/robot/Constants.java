@@ -22,7 +22,7 @@ public final class Constants
   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED  = Units.feetToMeters(14.5);
+  public static final double MAX_SPEED  = Units.feetToMeters(18.5);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
 //  public static final class AutonConstants
@@ -47,5 +47,22 @@ public final class Constants
     public static final double LEFT_Y_DEADBAND = 0.1;
     public static final double RIGHT_X_DEADBAND = 0.1;
     public static final double TURN_CONSTANT    = 6;
+  }
+
+  public static class ElevatorConstants{
+    //Elevator Math
+    public static final int COUNTS_PER_ROTATION = 3402;
+    public static final int MAX_EXTENTION_INCHES = 11;
+    public static final int INCHES_PER_ROTATION = 1; //replace with actual when determined
+    public static final int COUNTS_PER_INCH = COUNTS_PER_ROTATION/INCHES_PER_ROTATION;
+    
+    
+    //Elevator Set Points
+    public static final int STOWED = 0;
+    public static final int CORAL_STATION = 0; // change when actual determined
+    public static final int LEVEL_ONE = 0; // change when actual determined
+    public static final int LEVEL_TWO = 0; // change when actual determined
+    public static final int LEVEL_THREE = 0; // change when actual determined
+
   }
 }
