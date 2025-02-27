@@ -1,0 +1,83 @@
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
+
+public class ClawRobot extends TimedRobot {
+
+    private CANSparkMax clawMotor;
+    private XboxController controller;
+    private Timer timer;
+
+    private enum ClawState {
+        PHASE_1,
+        PHASE_2,
+        MOVING
+    }
+
+    private ClawState currentClawState = ClawState.PHASE_1; /
+
+    private final double PHASE_1_POSITION_MOTOR_ROTATIONS = 20.0 * 3.0;
+    private final double PHASE_2_POSITION_MOTOR_ROTATIONS = 200.0 * 3.0; 
+    private final double TRANSITION_TIME = 0.5; 
+
+    private double startTime = 0.0;
+    private double startPosition = 0.0;
+    private double targetPosition = 0.0;
+
+    @Override
+    public void robotInit() {
+        clawMotor = new CANSparkMax(2, MotorType.kBrushless); // reminder to raplace 2 with accurate CAN ID
+        controller = new XboxController(0); // replace 0 with  controller port
+        timer = new Timer();
+    }
+
+    @Override
+    public void teleopPeriodic() {
+        if (controller.getBButtonPressed() && currentClawState != ClawState.MOVING) {
+            startTransition();
+        }
+
+        updateClawPosition();
+    }
+
+    private void startTransition() {
+        startPosition = clawMotor.getEncoder().getPosition();
+        targetPosition = (currentClawState == ClawState.PHASE_1) ? PHASE_2_POSITION_MOTOR_ROTATIONS : PHASE_1_POSITION_MOTOR_ROTATIONS;
+        startTime = timer.getFPGATimestamp();
+        currentClawState = ClawState.MOVING;
+    }
+
+    private void updateClawPosition() {
+        if (currentClawState == ClawState.MOVING) {
+            double elapsedTime = timer.getFPGATimestamp() - startTime;
+            if (elapsedTime >= TRANSITION_TIME) {
+                clawMotor.getEncoder().setPosition(targetPosition);
+                currentClawState = (targetPosition == PHASE_1_POSITION_MOTOR_ROTATIONS) ? ClawState.PHASE_1 : ClawState.PHASE_2;
+            } else {
+                double progress = elapsedTime / TRANSITION_TIME;
+                double currentPosition = startPosition + (targetPosition - startPosition) * progress;
+                clawMotor.getEncoder().setPosition(currentPosition);
+            }
+        } else {
+            double targetPosition = (currentClawState == ClawState.PHASE_1) ? PHASE_1_POSITION_MOTOR_ROTATIONS : PHASE_2_POSITION_MOTOR_ROTATIONS;
+            // Ensure the motor doesn't rotate more than 180 degrees
+            double currentPosition = clawMotor.getEncoder().getPosition();
+            double distanceToPhase1 = Math.abs(currentPosition - PHASE_1_POSITION_MOTOR_ROTATIONS);
+            double distanceToPhase2 = Math.abs(currentPosition - PHASE_2_POSITION_MOTOR_ROTATIONS);
+
+            if (distanceToPhase1 > 180 * 3.0 && currentClawState == ClawState.PHASE_1) {
+                targetPosition = PHASE_1_POSITION_MOTOR_ROTATIONS;
+            }
+            if (distanceToPhase2 > 180 * 3.0 && currentClawState == ClawState.PHASE_2) {
+                targetPosition = PHASE_2_POSITION_MOTOR_ROTATIONS;
+            }
+
+            clawMotor.getEncoder().setPosition(targetPosition);
+        }
+        // Very basic proportional control, replace with better PID control.
+        double error = clawMotor.getEncoder().getPosition() - clawMotor.getEncoder().getPosition();
+        clawMotor.set(error * 0.1);
+    }
+}
