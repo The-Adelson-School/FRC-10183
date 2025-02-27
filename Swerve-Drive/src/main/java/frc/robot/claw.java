@@ -16,7 +16,7 @@ public class ResistanceMotor extends TimedRobot {
 
     @Override
     public void robotInit() {
-        motor = new CANSparkMax(3, MotorType.kBrushless); //replace with can id
+        motor = new CANSparkMax(7, MotorType.kBrushless); 
         controller = new XboxController(0); // replace with controller port
     }
 
