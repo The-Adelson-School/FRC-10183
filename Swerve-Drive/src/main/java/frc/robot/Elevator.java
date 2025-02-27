@@ -10,22 +10,22 @@ public class ElevatorRobot extends TimedRobot {
     private XboxController controller;
     private Timer timer;
 
-    private final double STAGE_1_HEIGHT = 0.3; // feet
-    private final double STAGE_2_HEIGHT = 0.66; // feet
-    private final double STAGE_3_HEIGHT = 1.0; // feet
-    private final double TOTAL_CLIMB_TIME = 2.0; // seconds
-    private final double GEAR_RATIO = 9.0; // 9:1 cartridge
+    private final double STAGE_1_HEIGHT = 0.3; // feet (f)
+    private final double STAGE_2_HEIGHT = 0.66; // f
+    private final double STAGE_3_HEIGHT = 1.0; // change this and two above with accurate values in f
+    private final double TOTAL_CLIMB_TIME = 2.0; // seconds (s)
+    private final double GEAR_RATIO = 9.0; 
 
-    private double targetHeight = 0.0; // feet
-    private double currentHeight = 0.0; // feet
+    private double targetHeight = 0.0; // this is also in f
+    private double currentHeight = 0.0; // in f
     private double startTime = 0.0;
 
     @Override
     public void robotInit() {
-        elevatorMotor = new CANSparkMax(1, MotorType.kBrushless); // Replace 1 with your CAN ID
-        controller = new XboxController(0); // Replace 0 with your controller port
+        elevatorMotor = new CANSparkMax(1, MotorType.kBrushless); // reminder to replace 1 with  CAN ID
+        controller = new XboxController(0); // reminder to replace 0 with controller port
         timer = new Timer();
-        elevatorMotor.getEncoder().setPosition(0); //Reset Encoder at start
+        elevatorMotor.getEncoder().setPosition(0); 
     }
 
     @Override
@@ -62,7 +62,7 @@ public class ElevatorRobot extends TimedRobot {
 
     private double feetToRotations(double feet) {
         
-        double feetPerRotation = 0.166; // Example, replace with actual value.
+        double feetPerRotation = 0.166; // make sure this is accurate
         return (feet / feetPerRotation) * GEAR_RATIO;
     }
 
