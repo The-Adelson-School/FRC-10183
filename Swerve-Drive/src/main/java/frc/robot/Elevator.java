@@ -22,7 +22,7 @@ public class ElevatorRobot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        elevatorMotor = new CANSparkMax(6, MotorType.kBrushless); // reminder to replace 1 with  CAN ID
+        elevatorMotor = new CANSparkMax(6, MotorType.kBrushless); 
         controller = new XboxController(0); // reminder to replace 0 with controller port
         timer = new Timer();
         elevatorMotor.getEncoder().setPosition(0); 
