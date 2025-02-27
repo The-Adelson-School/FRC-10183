@@ -16,21 +16,21 @@ public class ClawRobot extends TimedRobot {
         MOVING
     }
 
-    private ClawState currentClawState = ClawState.PHASE_1; // Initial state
+    private ClawState currentClawState = ClawState.PHASE_1; 
 
-    private final double PHASE_1_POSITION_MOTOR_ROTATIONS = 20.0 * 3.0; // 20 degrees * 3 gear ratio
-    private final double PHASE_2_POSITION_MOTOR_ROTATIONS = 200.0 * 3.0; // 200 degrees * 3 gear ratio
-    private final double TRANSITION_TIME = 0.5; // 0.5 seconds transition time
+    private final double PHASE_1_POSITION_MOTOR_ROTATIONS = 20.0 * 3.0; 
+    private final double PHASE_2_POSITION_MOTOR_ROTATIONS = 200.0 * 3.0; 
+    private final double TRANSITION_TIME = 0.5;
     private final double TRIGGER_THRESHOLD = 0.1;
 
     private double startTime = 0.0;
     private double startPosition = 0.0;
-    private double targetPosition = 0.0;
+    private double targetPosition = 0.0
 
     @Override
     public void robotInit() {
-        clawMotor = new CANSparkMax(2, MotorType.kBrushless); // Replace 2 with your CAN ID
-        controller = new XboxController(0); // Replace 0 with your controller port
+        clawMotor = new CANSparkMax(2, MotorType.kBrushless); // replace 2 with can id
+        controller = new XboxController(0); // replace 0 with controller port
         timer = new Timer();
     }
 
