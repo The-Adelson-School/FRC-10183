@@ -4,79 +4,83 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 
-public class ElevatorRobot extends TimedRobot {
+public class ClawRobot extends TimedRobot {
 
-    private CANSparkMax elevatorMotor;
+    private CANSparkMax clawMotor;
     private XboxController controller;
     private Timer timer;
 
-    private final double STAGE_1_HEIGHT = 0.3; // feet (f)
-    private final double STAGE_2_HEIGHT = 0.66; // f
-    private final double STAGE_3_HEIGHT = 1.0; // change this and two above with accurate values
-    private final double TOTAL_CLIMB_TIME = 2.0; // seconds (s)
-    private final double GEAR_RATIO = 9.0; 
+    private enum ClawState {
+        PHASE_1,
+        PHASE_2,
+        MOVING
+    }
 
-    private double targetHeight = 0.0; // this is also in f
-    private double currentHeight = 0.0; // in f
+    private ClawState currentClawState = ClawState.PHASE_1; // Initial state
+
+    private final double PHASE_1_POSITION_MOTOR_ROTATIONS = 20.0 * 3.0; // 20 degrees * 3 gear ratio
+    private final double PHASE_2_POSITION_MOTOR_ROTATIONS = 200.0 * 3.0; // 200 degrees * 3 gear ratio
+    private final double TRANSITION_TIME = 0.5; // 0.5 seconds transition time
+    private final double TRIGGER_THRESHOLD = 0.1;
+
     private double startTime = 0.0;
+    private double startPosition = 0.0;
+    private double targetPosition = 0.0;
 
     @Override
     public void robotInit() {
-        elevatorMotor = new CANSparkMax(1, MotorType.kBrushless); // reminder to replace 1 with  CAN ID
-        controller = new XboxController(0); // reminder to replace 0 with controller port
+        clawMotor = new CANSparkMax(2, MotorType.kBrushless); // Replace 2 with your CAN ID
+        controller = new XboxController(0); // Replace 0 with your controller port
         timer = new Timer();
-        elevatorMotor.getEncoder().setPosition(0); 
     }
 
     @Override
     public void teleopPeriodic() {
-        if (controller.getXButtonPressed()) {
-            targetHeight = STAGE_1_HEIGHT;
-            startTime = timer.getFPGATimestamp();
-        } else if (controller.getYButtonPressed()) {
-            targetHeight = STAGE_2_HEIGHT;
-            startTime = timer.getFPGATimestamp();
-        } else if (controller.getAButtonPressed()) {
-            targetHeight = STAGE_3_HEIGHT;
-            startTime = timer.getFPGATimestamp();
+        double leftTriggerValue = controller.getLeftTriggerAxis();
+
+        if (leftTriggerValue > TRIGGER_THRESHOLD && currentClawState != ClawState.MOVING) {
+            startTransition();
         }
 
-        double elapsedTime = timer.getFPGATimestamp() - startTime;
-        if (elapsedTime <= TOTAL_CLIMB_TIME) {
-            currentHeight = calculateCurrentHeight(elapsedTime);
-            double motorRotations = feetToRotations(currentHeight);
-            elevatorMotor.getEncoder().setPosition(motorRotations);
-            double speed = calculateSpeed(currentHeight, targetHeight, elapsedTime);
-            elevatorMotor.set(speed);
+        updateClawPosition();
+    }
+
+    private void startTransition() {
+        startPosition = clawMotor.getEncoder().getPosition();
+        targetPosition = (currentClawState == ClawState.PHASE_1) ? PHASE_2_POSITION_MOTOR_ROTATIONS : PHASE_1_POSITION_MOTOR_ROTATIONS;
+        startTime = timer.getFPGATimestamp();
+        currentClawState = ClawState.MOVING;
+    }
+    private void updateClawPosition() {
+        if (currentClawState == ClawState.MOVING) {
+            double elapsedTime = timer.getFPGATimestamp() - startTime;
+            if (elapsedTime >= TRANSITION_TIME) {
+                clawMotor.getEncoder().setPosition(targetPosition);
+                currentClawState = (targetPosition == PHASE_1_POSITION_MOTOR_ROTATIONS) ? ClawState.PHASE_1 : ClawState.PHASE_2;
+            } else {
+                double progress = elapsedTime / TRANSITION_TIME;
+                double currentPosition = startPosition + (targetPosition - startPosition) * progress;
+                clawMotor.getEncoder().setPosition(currentPosition);
+            }
         } else {
-            double motorRotations = feetToRotations(targetHeight);
-            elevatorMotor.getEncoder().setPosition(motorRotations);
-            elevatorMotor.set(calculateSpeed(targetHeight, targetHeight, TOTAL_CLIMB_TIME));
+            double targetPosition = (currentClawState == ClawState.PHASE_1) ? PHASE_1_POSITION_MOTOR_ROTATIONS : PHASE_2_POSITION_MOTOR_ROTATIONS;
+            // Ensure the motor doesn't rotate more than 180 degrees
+            double currentPosition = clawMotor.getEncoder().getPosition();
+            double distanceToPhase1 = Math.abs(currentPosition - PHASE_1_POSITION_MOTOR_ROTATIONS);
+            double distanceToPhase2 = Math.abs(currentPosition - PHASE_2_POSITION_MOTOR_ROTATIONS);
+
+            if (distanceToPhase1 > 180 * 3.0 && currentClawState == ClawState.PHASE_1) {
+                targetPosition = PHASE_1_POSITION_MOTOR_ROTATIONS;
+            }
+            if (distanceToPhase2 > 180 * 3.0 && currentClawState == ClawState.PHASE_2) {
+                targetPosition = PHASE_2_POSITION_MOTOR_ROTATIONS;
+            }
+
+            clawMotor.getEncoder().setPosition(targetPosition);
+
+            // Very basic proportional control, replace with better PID control.
+            double error = targetPosition - clawMotor.getEncoder().getPosition();
+            clawMotor.set(error * 0.1);
         }
-    }
-
-    private double calculateCurrentHeight(double elapsedTime) {
-        if(elapsedTime > TOTAL_CLIMB_TIME) return targetHeight;
-        return targetHeight * (elapsedTime / TOTAL_CLIMB_TIME);
-    }
-
-    private double feetToRotations(double feet) {
-        
-        double feetPerRotation = 0.166; // make sure this is accurate
-        return (feet / feetPerRotation) * GEAR_RATIO;
-    }
-
-    private double calculateSpeed(double currentHeight, double targetHeight, double elapsedTime) {
-
-        double distanceToTarget = targetHeight - currentHeight;
-        if (elapsedTime <= 0) {
-            return 0;
-        }
-
-        if(elapsedTime >= TOTAL_CLIMB_TIME) {
-            return 0;
-        }
-        return distanceToTarget / (TOTAL_CLIMB_TIME);
-
     }
 }
