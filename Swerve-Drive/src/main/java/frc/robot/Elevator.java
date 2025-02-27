@@ -16,13 +16,13 @@ public class ElevatorRobot extends TimedRobot {
     private final double TOTAL_CLIMB_TIME = 2.0; // seconds (s)
     private final double GEAR_RATIO = 9.0; 
 
-    private double targetHeight = 0.0; // this is also in f
-    private double currentHeight = 0.0; // in f
+    private double targetHeight = 0.0; 
+    private double currentHeight = 0.0; 
     private double startTime = 0.0;
 
     @Override
     public void robotInit() {
-        elevatorMotor = new CANSparkMax(1, MotorType.kBrushless); // reminder to replace 1 with  CAN ID
+        elevatorMotor = new CANSparkMax(6, MotorType.kBrushless); // reminder to replace 1 with  CAN ID
         controller = new XboxController(0); // reminder to replace 0 with controller port
         timer = new Timer();
         elevatorMotor.getEncoder().setPosition(0); 
