@@ -1,12 +1,12 @@
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMax;
+import com.revrobotics.SparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 
 public class ElevatorRobot extends TimedRobot {
 
-    private CANSparkMax elevatorMotor;
+    private SparkMax elevatorMotor;
     private XboxController controller;
     private Timer timer;
 
@@ -14,7 +14,7 @@ public class ElevatorRobot extends TimedRobot {
     private final double STAGE_2_HEIGHT = 0.66; // feet
     private final double STAGE_3_HEIGHT = 1.0; // feet
     private final double TOTAL_CLIMB_TIME = 2.0; // seconds
-    private final double GEAR_RATIO = 9.0; // 9:1 cartridge
+    private final double GEAR_RATIO = 9.0; // 9:1 
 
     private double targetHeight = 0.0; // feet
     private double currentHeight = 0.0; // feet
