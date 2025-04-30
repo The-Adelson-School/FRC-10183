@@ -4,11 +4,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoMode;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to each mode, as
@@ -41,6 +45,7 @@ public class Robot extends TimedRobot
   @Override
   public void robotInit()
   {
+    
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -53,7 +58,18 @@ public class Robot extends TimedRobot
     {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
+   // UsbCamera ClawCamera = CameraServer.startAutomaticCapture();
+ //   UsbCamera LiftCamera = CameraServer.startAutomaticCapture();
+// ClawCamera.setResolution(640, 480);
+// LiftCamera.setResolution(640, 480);
+//LiftCamera.setFPS(10);
+//ClawCamera.setFPS(10);
+
+
+
+
   }
+ 
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics that you want ran
@@ -90,6 +106,7 @@ public class Robot extends TimedRobot
     {
       m_robotContainer.setMotorBrake(false);
       disabledTimer.stop();
+      disabledTimer.reset();
     }
   }
 
@@ -105,6 +122,9 @@ public class Robot extends TimedRobot
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null)
     {
+             
+  
+      RobotModeTriggers.autonomous();
       m_autonomousCommand.schedule();
     }
   }
@@ -131,7 +151,6 @@ public class Robot extends TimedRobot
     {
       CommandScheduler.getInstance().cancelAll();
     }
-    m_robotContainer.setDriveMode();
   }
 
   /**
@@ -140,7 +159,6 @@ public class Robot extends TimedRobot
   @Override
   public void teleopPeriodic()
   {
-    
   }
 
   @Override
@@ -148,7 +166,6 @@ public class Robot extends TimedRobot
   {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
-    m_robotContainer.setDriveMode();
   }
 
   /**
@@ -173,5 +190,10 @@ public class Robot extends TimedRobot
   @Override
   public void simulationPeriodic()
   {
+    
   }
+
+
+
+
 }

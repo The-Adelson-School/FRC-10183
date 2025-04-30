@@ -37,4 +37,6 @@ public class LazyCANSparkMax extends SparkMax {
 	public double getSetpoint() {
 		return prevValue;
 	}
+
+	
 }
