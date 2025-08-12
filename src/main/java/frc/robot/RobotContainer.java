@@ -23,6 +23,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.elevator.AutoAlignWrapper;
 // import frc.robot.Constants.AlgaeConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.elevator.AutoAlignWrapper;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.hanger.HangerSubsystem;
 import frc.robot.subsystems.AlignToReefTagRelative;
@@ -39,8 +40,11 @@ import swervelib.SwerveInputStream;
  * little robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls).
  * Instead, the structure of the robot (including subsystems, commands, and trigger mappings) should be declared here.
  */
+
+ 
 public class RobotContainer
 {
+  
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
@@ -144,7 +148,7 @@ public class RobotContainer
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
-    if (Robot.isSimulation())
+   /*  if (Robot.isSimulation())
     {
       driveDirectAngleKeyboard.driveToPose(() -> new Pose2d(new Translation2d(9, 3),
                                                             Rotation2d.fromDegrees(90)),
@@ -166,7 +170,7 @@ public class RobotContainer
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
 
-    }
+    } */
     if (DriverStation.isTest())
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
@@ -190,7 +194,7 @@ public class RobotContainer
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
+  //    driverXbox.rightBumper().onTrue(Commands.none());
       //Operator Bindings
       operatorXbox.povUp().onTrue(new InstantCommand(() -> elevator.increaseStage(), elevator));
       operatorXbox.povDown().onTrue(new InstantCommand(() -> elevator.decreaseStage(), elevator));
@@ -210,8 +214,8 @@ operatorXbox.leftBumper()
     operatorXbox.x().onTrue(new InstantCommand(() -> hanger.setStage(0), hanger));
     operatorXbox.a().onTrue(new InstantCommand(() -> hanger.setStage(2), hanger));
     //Camera Stuff
-driverXbox.rightBumper().onTrue(new AutoAlignWrapper(drivebase, true).withTimeout(3));
-driverXbox.leftBumper().onTrue(new AutoAlignWrapper(drivebase, false).withTimeout(3));
+driverXbox.rightBumper().onTrue(new AutoAlignWrapper(drivebase, true).withTimeout(4));
+driverXbox.leftBumper().onTrue(new AutoAlignWrapper(drivebase, false).withTimeout(4));
   //Algae Stuff
     //  operatorXbox.x().whileTrue(new InstantCommand(() -> algae.setIntakeSpeed(AlgaeConstants.INTAKE_IN), algae));
     // operatorXbox.b().whileTrue(new InstantCommand(() -> algae.setIntakeSpeed(AlgaeConstants.INTAKE_OUT), algae));

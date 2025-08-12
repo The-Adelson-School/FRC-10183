@@ -114,7 +114,7 @@ public final class Constants
 
   public static class VisionConstants{
     public static final double X_REEF_ALIGNMENT_P = 1.1;
-    public static final double Y_REEF_ALIGNMENT_P = 1.1;
+    public static final double Y_REEF_ALIGNMENT_P = 1.8;
     public static final double ROT_REEF_ALIGNMENT_P = 0.03;
   
     public static final double ROT_SETPOINT_REEF_ALIGNMENT = 0.2;  // Rotation
