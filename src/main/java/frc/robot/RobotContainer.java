@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
@@ -214,9 +216,35 @@ operatorXbox.leftBumper()
     operatorXbox.x().onTrue(new InstantCommand(() -> hanger.setStage(0), hanger));
     operatorXbox.a().onTrue(new InstantCommand(() -> hanger.setStage(2), hanger));
     //Camera Stuff
-driverXbox.rightBumper().onTrue(new AutoAlignWrapper(drivebase, true).withTimeout(4));
-driverXbox.leftBumper().onTrue(new AutoAlignWrapper(drivebase, false).withTimeout(4));
-  //Algae Stuff
+    driverXbox.rightBumper().onTrue(
+        new SequentialCommandGroup(
+            // Align with the reef tag
+            new AlignToReefTagRelative(true, drivebase).withTimeout(3),
+    
+            // Activate stage 4
+           new InstantCommand(() -> elevator.engageStage(4)),
+          new WaitCommand(1.5),
+    
+            // Set intake motor to output
+            new InstantCommand(() -> elevator.setIntakeSpeed(ElevatorConstants.INTAKE_OUT))
+        )
+    );
+
+    driverXbox.leftBumper().onTrue(
+        new SequentialCommandGroup(
+            // Align with the reef tag
+            new AlignToReefTagRelative(false, drivebase).withTimeout(3),
+    
+            // Activate stage 4
+            new InstantCommand(() -> elevator.engageStage(4)),
+    
+            // Wait for 6 seconds
+            new WaitCommand(6),
+    
+            // Set intake motor to output
+            new InstantCommand(() -> elevator.setIntakeSpeed(ElevatorConstants.INTAKE_OUT))
+        )
+    );
     //  operatorXbox.x().whileTrue(new InstantCommand(() -> algae.setIntakeSpeed(AlgaeConstants.INTAKE_IN), algae));
     // operatorXbox.b().whileTrue(new InstantCommand(() -> algae.setIntakeSpeed(AlgaeConstants.INTAKE_OUT), algae));
     // operatorXbox.y().whileTrue(new InstantCommand(() -> algae.lowerArm(), algae));

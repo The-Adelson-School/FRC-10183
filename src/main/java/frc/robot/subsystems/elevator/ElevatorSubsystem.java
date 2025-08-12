@@ -30,8 +30,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     
     int stage = 0;
     
-    PIDController elevController = new PIDController(0.000021, 0.000000, 0.00000); //currently needs testing
-    PIDController wristController = new PIDController(0.000013, 0.00000, 0.00000); // needs test
+    PIDController elevController = new PIDController(0.00003, 0.000000, 0.00000); //currently needs testing
+    PIDController wristController = new PIDController(0.00003, 0.00000, 0.00000); // needs test
 
     public int getStage(){
         return stage;
@@ -74,25 +74,29 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     
-    public void engageStage(){
+    public void engageStage() {
+        // Use the current stage variable as the target stage
+        engageStage(stage);
+    }
+    
+    // Existing engageStage method with an argument
+    public void engageStage(int targetStage) {
+        stage = targetStage;
         SmartDashboard.putNumber("Stage", stage);
-        if(stage == 0){
+        if (stage == 0) {
             goToHeight(ElevatorConstants.STOWED_LEVEL, ElevatorConstants.STOWED_ANGLE);
-        }else if(stage == 1){
+        } else if (stage == 1) {
             goToHeight(ElevatorConstants.CORAL_STATION, ElevatorConstants.CORAL_ANGLE);
-        }
-        else if(stage == 2){
+        } else if (stage == 2) {
             goToHeight(ElevatorConstants.LEVEL_ONE, ElevatorConstants.SCORING_ANGLE);
-        }else if(stage == 3){
+        } else if (stage == 3) {
             goToHeight(ElevatorConstants.LEVEL_TWO, ElevatorConstants.SCORING_ANGLE);
-        }else if(stage == 4){
+        } else if (stage == 4) {
             goToHeight(ElevatorConstants.LEVEL_THREE, ElevatorConstants.SCORING_ANGLE);
-        }
-        else if(stage == 5){
+        } else if (stage == 5) {
             goToHeight(ElevatorConstants.LEVEL_FOUR, ElevatorConstants.LEVEL_FOUR_ANGLE);
         }
     }
-    
     
     public void defaultCommand() {
         engageStage(); 

@@ -73,8 +73,8 @@ public final class Constants
     public static final int LEVEL_FOUR = (int)(21.375 * COUNTS_PER_INCH); // 22.875 in
 
     //Wrist Set Points
-    public static final int STOWED_ANGLE = 0; 
-    public static final int CORAL_ANGLE = -(int)(76 * COUNTS_PER_DEGREE); // aprx. 50° NEEDS TO BE INVERTED
+    public static final int STOWED_ANGLE = 10; 
+    public static final int CORAL_ANGLE = -(int)(80 * COUNTS_PER_DEGREE); // aprx. 50° NEEDS TO BE INVERTED
     public static final int SCORING_ANGLE = -(int)(28 * COUNTS_PER_DEGREE); // aprx. 25° 
     public static final int HANGING_ANGLE = -(int)(160 * COUNTS_PER_DEGREE);
     public static final int LEVEL_FOUR_ANGLE = -(int)(125 * COUNTS_PER_DEGREE); // aprx. 180° NEEDS TO BE INVERTED
@@ -113,7 +113,7 @@ public final class Constants
   }
 
   public static class VisionConstants{
-    public static final double X_REEF_ALIGNMENT_P = 1.1;
+    public static final double X_REEF_ALIGNMENT_P = 2;
     public static final double Y_REEF_ALIGNMENT_P = 1.8;
     public static final double ROT_REEF_ALIGNMENT_P = 0.03;
   
@@ -121,8 +121,8 @@ public final class Constants
     public static final double ROT_TOLERANCE_REEF_ALIGNMENT = 0;
     public static final double X_SETPOINT_REEF_ALIGNMENT = -0.3;  // Vertical pose
     public static final double X_TOLERANCE_REEF_ALIGNMENT = 0.6;
-    public static final double Y_SETPOINT_REEF_ALIGNMENT = 0.17;  // Horizontal pose
-    public static final double Y_TOLERANCE_REEF_ALIGNMENT = 0.19;
+    public static final double Y_SETPOINT_REEF_ALIGNMENT = 0.14;  // Horizontal pose
+    public static final double Y_TOLERANCE_REEF_ALIGNMENT = 0.45;
 
     public static final double DONT_SEE_TAG_WAIT_TIME = 3;
     public static final double POSE_VALIDATION_TIME = 0.3;
