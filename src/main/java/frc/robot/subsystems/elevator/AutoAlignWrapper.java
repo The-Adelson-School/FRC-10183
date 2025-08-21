@@ -17,7 +17,7 @@ public class AutoAlignWrapper extends SequentialCommandGroup {
             new InstantCommand(() -> drivebase.setHeadingCorrection(true)),
 
             // Perform the auto-align
-            new AlignToReefTagRelative(alignToReefTagRelative, drivebase).withTimeout(3),
+            new AlignToReefTagRelative(alignToReefTagRelative, drivebase),
 
             // Disable heading correction (if not needed after alignment)
             new InstantCommand(() -> drivebase.setHeadingCorrection(false))

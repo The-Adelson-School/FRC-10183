@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -32,10 +33,9 @@ import frc.robot.subsystems.AlignToReefTagRelative;
 // import frc.robot.subsystems.algae.AlgaeSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
+import com.pathplanner.lib.auto.NamedCommands;
 
-
-
-
+  // Other setup code...
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -46,8 +46,6 @@ import swervelib.SwerveInputStream;
  
 public class RobotContainer
 {
-  
-
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
   final         CommandXboxController operatorXbox = new CommandXboxController(1);
@@ -120,6 +118,9 @@ public class RobotContainer
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("Intake Out", new InstantCommand(() -> elevator.autonomousCommand()));
     NamedCommands.registerCommand("test", Commands.print("I EXIST!"));
+    NamedCommands.registerCommand("ReefTagIntake", reefTagIntakeSequence());
+    NamedCommands.registerCommand("TestCommand", new InstantCommand(() -> System.out.println("Test!")));
+    NamedCommands.registerCommand("ReefTagIntakeStage1", reefTagIntakeStage1Command());
   }
 
   /**
@@ -150,7 +151,7 @@ public class RobotContainer
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
-   /*  if (Robot.isSimulation())
+     if (Robot.isSimulation())
     {
       driveDirectAngleKeyboard.driveToPose(() -> new Pose2d(new Translation2d(9, 3),
                                                             Rotation2d.fromDegrees(90)),
@@ -172,7 +173,7 @@ public class RobotContainer
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
 
-    } */
+    }
     if (DriverStation.isTest())
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
@@ -219,32 +220,33 @@ operatorXbox.leftBumper()
     driverXbox.rightBumper().onTrue(
         new SequentialCommandGroup(
             // Align with the reef tag
-            new AlignToReefTagRelative(true, drivebase).withTimeout(3),
-    
-            // Activate stage 4
-           new InstantCommand(() -> elevator.engageStage(4)),
-          new WaitCommand(1.5),
-    
+            new ParallelCommandGroup(
+            new AlignToReefTagRelative(true, drivebase),
+            new InstantCommand(() -> elevator.engageStage(4))
+            ),
             // Set intake motor to output
             new InstantCommand(() -> elevator.setIntakeSpeed(ElevatorConstants.INTAKE_OUT))
         )
     );
 
     driverXbox.leftBumper().onTrue(
-        new SequentialCommandGroup(
-            // Align with the reef tag
-            new AlignToReefTagRelative(false, drivebase).withTimeout(3),
-    
-            // Activate stage 4
-            new InstantCommand(() -> elevator.engageStage(4)),
-    
-            // Wait for 6 seconds
-            new WaitCommand(6),
-    
-            // Set intake motor to output
-            new InstantCommand(() -> elevator.setIntakeSpeed(ElevatorConstants.INTAKE_OUT))
-        )
-    );
+    new SequentialCommandGroup(
+        // Run AlignToReefTagRelative and engageStage(4) simultaneously
+        new ParallelCommandGroup(
+            new AlignToReefTagRelative(true, drivebase),
+            new InstantCommand(() -> elevator.engageStage(3))
+        ),
+        new InstantCommand(() -> elevator.setIntakeSpeed(ElevatorConstants.INTAKE_OUT))
+    )
+);
+driverXbox.leftTrigger().onTrue(
+    new ParallelCommandGroup(
+      new AlignToReefTagRelative(true, drivebase),
+      new InstantCommand(() -> elevator.engageStage(1))
+    )
+    .andThen(new InstantCommand(() -> elevator.setIntakeSpeed(ElevatorConstants.INTAKE_IN)))
+    .andThen(new InstantCommand(() -> elevator.setIntakeSpeed(ElevatorConstants.INTAKE_IN)))
+);
     //  operatorXbox.x().whileTrue(new InstantCommand(() -> algae.setIntakeSpeed(AlgaeConstants.INTAKE_IN), algae));
     // operatorXbox.b().whileTrue(new InstantCommand(() -> algae.setIntakeSpeed(AlgaeConstants.INTAKE_OUT), algae));
     // operatorXbox.y().whileTrue(new InstantCommand(() -> algae.lowerArm(), algae));
@@ -261,11 +263,34 @@ operatorXbox.leftBumper()
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New Auto");
+    return drivebase.getAutonomousCommand("New New New New Auto");
   }
 
   public void setMotorBrake(boolean brake)
   {
     drivebase.setMotorBrake(brake);
   }
+  public Command reefTagIntakeSequence() {
+    return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+            new AlignToReefTagRelative(true, drivebase),
+            new InstantCommand(() -> elevator.engageStage(4))
+        ),
+        new InstantCommand(() -> elevator.setIntakeSpeed(ElevatorConstants.INTAKE_OUT))
+    );
+}
+private void registerNamedCommands() {
+  NamedCommands.registerCommand("ReefTagIntake", reefTagIntakeSequence());
+  // Add more named commands here
+}
+public Command reefTagIntakeStage1Command() {
+  return new ParallelCommandGroup(
+      new AlignToReefTagRelative(true, drivebase),
+      new InstantCommand(() -> elevator.engageStage(1))
+  )
+  .andThen(new InstantCommand(() -> elevator.setIntakeSpeed(ElevatorConstants.INTAKE_IN)))
+  .andThen(new InstantCommand(() -> elevator.setIntakeSpeed(ElevatorConstants.INTAKE_IN)));
+}
+
+
 }

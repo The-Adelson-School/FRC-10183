@@ -62,7 +62,7 @@ public class Robot extends TimedRobot
  //   UsbCamera LiftCamera = CameraServer.startAutomaticCapture();
 // ClawCamera.setResolution(640, 480);
 // LiftCamera.setResolution(640, 480);
-//LiftCamera.setFPS(10);
+//LiftCamera.setaFPS(10);
 //ClawCamera.setFPS(10);
 
 

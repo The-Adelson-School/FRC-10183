@@ -66,16 +66,16 @@ public final class Constants
     //Elevator Set Points
     public static final int HANGING_LEVEL =(int)(1.5 * COUNTS_PER_INCH);
     public static final int STOWED_LEVEL = (int)(1.5 * COUNTS_PER_INCH);
-    public static final int CORAL_STATION = (int)(2.5 * COUNTS_PER_INCH);
+    public static final int CORAL_STATION = (int)(0.5 * COUNTS_PER_INCH);
     public static final int LEVEL_ONE = (int)(1.5 * COUNTS_PER_INCH);
     public static final int LEVEL_TWO = (int)(4 * COUNTS_PER_INCH); // 11.75 in
-    public static final int LEVEL_THREE = (int)(21.775 * COUNTS_PER_INCH);; // 22.875 in
+    public static final int LEVEL_THREE = (int)(22.275 * COUNTS_PER_INCH);; // 22.875 in
     public static final int LEVEL_FOUR = (int)(21.375 * COUNTS_PER_INCH); // 22.875 in
 
     //Wrist Set Points
     public static final int STOWED_ANGLE = 10; 
-    public static final int CORAL_ANGLE = -(int)(80 * COUNTS_PER_DEGREE); // aprx. 50° NEEDS TO BE INVERTED
-    public static final int SCORING_ANGLE = -(int)(28 * COUNTS_PER_DEGREE); // aprx. 25° 
+    public static final int CORAL_ANGLE = -(int)(58 * COUNTS_PER_DEGREE); // aprx. 50° NEEDS TO BE INVERTED
+    public static final int SCORING_ANGLE = -(int)(20 * COUNTS_PER_DEGREE); // aprx. 25° 
     public static final int HANGING_ANGLE = -(int)(160 * COUNTS_PER_DEGREE);
     public static final int LEVEL_FOUR_ANGLE = -(int)(125 * COUNTS_PER_DEGREE); // aprx. 180° NEEDS TO BE INVERTED
 
@@ -114,18 +114,27 @@ public final class Constants
 
   public static class VisionConstants{
     public static final double X_REEF_ALIGNMENT_P = 2;
-    public static final double Y_REEF_ALIGNMENT_P = 1.8;
-    public static final double ROT_REEF_ALIGNMENT_P = 0.03;
+    public static final double Y_REEF_ALIGNMENT_P = 2;
+    public static final double ROT_REEF_ALIGNMENT_P = 0.1;
   
     public static final double ROT_SETPOINT_REEF_ALIGNMENT = 0.2;  // Rotation
-    public static final double ROT_TOLERANCE_REEF_ALIGNMENT = 0;
-    public static final double X_SETPOINT_REEF_ALIGNMENT = -0.3;  // Vertical pose
-    public static final double X_TOLERANCE_REEF_ALIGNMENT = 0.6;
-    public static final double Y_SETPOINT_REEF_ALIGNMENT = 0.14;  // Horizontal pose
-    public static final double Y_TOLERANCE_REEF_ALIGNMENT = 0.45;
+    public static final double ROT_TOLERANCE_REEF_ALIGNMENT = 3;
+    public static final double X_SETPOINT_REEF_ALIGNMENT = -0.53;  // Vertical pose
+    public static final double X_TOLERANCE_REEF_ALIGNMENT = 2.5;
+    public static final double Y_SETPOINT_REEF_ALIGNMENT = 0.12;  // Horizontal pose
+    public static final double Y_TOLERANCE_REEF_ALIGNMENT = 3;
 
-    public static final double DONT_SEE_TAG_WAIT_TIME = 3;
-    public static final double POSE_VALIDATION_TIME = 0.3;
+    public static final double DONT_SEE_TAG_WAIT_TIME = 1;
+    public static final double POSE_VALIDATION_TIME = 1;
   }
+  public static final double WHEEL_DIAMETER_METERS = 0.1016; // 4 in wheels
+  public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER_METERS * Math.PI;
+
+  public static final int ENCODER_CPR = 2048; // Falcon500 integrated encoder
+  public static final double GEAR_RATIO = 6.86; // Check your module config
+
+  public static final double METERS_PER_TICK =
+      WHEEL_CIRCUMFERENCE / (ENCODER_CPR * GEAR_RATIO);
+
   
 }

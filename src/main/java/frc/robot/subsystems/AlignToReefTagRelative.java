@@ -18,9 +18,9 @@ public class AlignToReefTagRelative extends Command {
   private double tagID = 1;
 
   public AlignToReefTagRelative(boolean isRightScore, SwerveSubsystem drivebase) {
-    xController = new PIDController(VisionConstants.X_REEF_ALIGNMENT_P, 0.0, 0);  // Vertical movement
-    yController = new PIDController(VisionConstants.Y_REEF_ALIGNMENT_P, 0.0, 0);  // Horitontal movement
-    rotController = new PIDController(VisionConstants.ROT_REEF_ALIGNMENT_P, 0, 0);  // Rotation
+    xController = new PIDController(VisionConstants.X_REEF_ALIGNMENT_P, 0.0, 0.0);  // Vertical movement
+    yController = new PIDController(VisionConstants.Y_REEF_ALIGNMENT_P, 0.0, 0.0);  // Horitontal movement
+    rotController = new PIDController(VisionConstants.ROT_REEF_ALIGNMENT_P, 0, 0.0);  // Rotation
     this.isRightScore = isRightScore;
     this.drivebase = drivebase;
     addRequirements(drivebase);
@@ -80,8 +80,19 @@ public class AlignToReefTagRelative extends Command {
 
   @Override
   public boolean isFinished() {
-    // Requires the robot to stay in the correct position for 0.3 seconds, as long as it gets a tag in the camera
-    return this.dontSeeTagTimer.hasElapsed(VisionConstants.DONT_SEE_TAG_WAIT_TIME) ||
-        stopTimer.hasElapsed(VisionConstants.POSE_VALIDATION_TIME);
+      // Check if the robot is within the acceptable tolerances for alignment
+      boolean isAligned = rotController.atSetpoint() &&
+                          yController.atSetpoint() &&
+                          xController.atSetpoint();
+  
+      // Log alignment status for debugging
+      SmartDashboard.putBoolean("Is Aligned", isAligned);
+      SmartDashboard.putNumber("Stop Timer", stopTimer.get());
+      SmartDashboard.putBoolean("Dont See Tag Timer Elapsed", dontSeeTagTimer.hasElapsed(VisionConstants.DONT_SEE_TAG_WAIT_TIME));
+  
+      // Stop if the robot is aligned for the required time or if the timers have elapsed
+      return (isAligned && stopTimer.hasElapsed(VisionConstants.POSE_VALIDATION_TIME)) ||
+             dontSeeTagTimer.hasElapsed(VisionConstants.DONT_SEE_TAG_WAIT_TIME);
   }
+
 }
