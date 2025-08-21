@@ -228,6 +228,13 @@ operatorXbox.leftBumper()
             new InstantCommand(() -> elevator.setIntakeSpeed(ElevatorConstants.INTAKE_OUT))
         )
     );
+    driverXbox.a().onTrue(
+      new SequentialCommandGroup(
+        new InstantCommand(() -> elevator.engageStage(2)),
+        new WaitCommand(6),
+        new InstantCommand(() -> elevator.setIntakeSpeed(ElevatorConstants.INTAKE_OUT))
+      )
+    );
 
     driverXbox.leftBumper().onTrue(
     new SequentialCommandGroup(

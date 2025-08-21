@@ -64,13 +64,13 @@ public final class Constants
     
     
     //Elevator Set Points
-    public static final int HANGING_LEVEL =(int)(1.5 * COUNTS_PER_INCH);
-    public static final int STOWED_LEVEL = (int)(1.5 * COUNTS_PER_INCH);
-    public static final int CORAL_STATION = (int)(0.5 * COUNTS_PER_INCH);
-    public static final int LEVEL_ONE = (int)(1.5 * COUNTS_PER_INCH);
+    public static final int HANGING_LEVEL =(int)(1.75 * COUNTS_PER_INCH);
+    public static final int STOWED_LEVEL = (int)(1.75 * COUNTS_PER_INCH);
+    public static final int CORAL_STATION = (int)(1.75 * COUNTS_PER_INCH);
+    public static final int LEVEL_ONE = (int)(1.75 * COUNTS_PER_INCH);
     public static final int LEVEL_TWO = (int)(4 * COUNTS_PER_INCH); // 11.75 in
     public static final int LEVEL_THREE = (int)(22.275 * COUNTS_PER_INCH);; // 22.875 in
-    public static final int LEVEL_FOUR = (int)(21.375 * COUNTS_PER_INCH); // 22.875 in
+    public static final int LEVEL_FOUR = (int)(21.875 * COUNTS_PER_INCH); // 22.875 in
 
     //Wrist Set Points
     public static final int STOWED_ANGLE = 10; 
