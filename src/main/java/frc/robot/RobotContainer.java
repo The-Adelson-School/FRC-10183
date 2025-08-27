@@ -270,7 +270,7 @@ driverXbox.leftTrigger().onTrue(
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New New New New Auto");
+    return drivebase.getAutonomousCommand("TEST1");
   }
 
   public void setMotorBrake(boolean brake)

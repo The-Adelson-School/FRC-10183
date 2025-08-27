@@ -1,6 +1,6 @@
 // Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Open Source Software; you can modify and/or share it under the terms of the
+// WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems.swervedrive;
 
@@ -97,7 +97,7 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED,
                                                                   new Pose2d(new Translation2d(Meter.of(1),
                                                                                                Meter.of(4)),
-                                                                             Rotation2d.fromDegrees(0)));
+                                                                             Rotation2d.fromDegrees(180)));
       // Alternative method if you don't want to supply the conversion factor via JSON files.
       // swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed, angleConversionFactor, driveConversionFactor);
     } catch (Exception e)
@@ -136,7 +136,7 @@ public class SwerveSubsystem extends SubsystemBase
                                   controllerCfg,
                                   Constants.MAX_SPEED,
                                   new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
-                                             Rotation2d.fromDegrees(0)));
+                                             Rotation2d.fromDegrees(180)));
   }
 
   /**
@@ -181,31 +181,61 @@ SmartDashboard.putNumber("Gyro Heading", swerveDrive.getPose().getRotation().get
       final boolean enableFeedforward = true;
       // Configure AutoBuilder last
       AutoBuilder.configure(
-          this::getPose,
-          // Robot pose supplier
-          this::resetOdometry,
-          // Method to reset odometry (will be called if your auto has a starting pose)
-          this::getRobotVelocity,
-          // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+          () -> {
+            // Transform pose to match PathPlanner coordinate system
+            Pose2d currentPose = getPose();
+            return new Pose2d(
+                currentPose.getX(),
+                currentPose.getY(), 
+                currentPose.getRotation().plus(Rotation2d.fromDegrees(180))
+            );
+          },
+          // Robot pose supplier with coordinate transformation
+          (pose) -> {
+            // Transform pose back from PathPlanner coordinate system
+            resetOdometry(new Pose2d(
+                pose.getX(),
+                pose.getY(),
+                pose.getRotation().minus(Rotation2d.fromDegrees(180))
+            ));
+          },
+          // Method to reset odometry
+          () -> {
+            // Transform velocity feedback to match coordinate system
+            ChassisSpeeds velocity = swerveDrive.getRobotVelocity();
+            return new ChassisSpeeds(
+                -velocity.vxMetersPerSecond,  // Invert X velocity
+                -velocity.vyMetersPerSecond,  // Invert Y velocity
+                -velocity.omegaRadiansPerSecond  // Invert rotation velocity
+            );
+          },
+          // ChassisSpeeds supplier with inverted velocity feedback
           (speedsRobotRelative, moduleFeedForwards) -> {
+            // Invert the commands back to robot coordinate system
+            ChassisSpeeds correctedSpeeds = new ChassisSpeeds(
+                -speedsRobotRelative.vxMetersPerSecond,  // Invert X back
+                -speedsRobotRelative.vyMetersPerSecond,  // Invert Y back
+                -speedsRobotRelative.omegaRadiansPerSecond  // Invert rotation back
+            );
+            
             if (enableFeedforward)
             {
               swerveDrive.drive(
-                  speedsRobotRelative,
-                  swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
+                  correctedSpeeds,
+                  swerveDrive.kinematics.toSwerveModuleStates(correctedSpeeds),
                   moduleFeedForwards.linearForces()
                                );
             } else
             {
-              swerveDrive.setChassisSpeeds(speedsRobotRelative);
+              swerveDrive.setChassisSpeeds(correctedSpeeds);
             }
           },
           // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
           new PPHolonomicDriveController(
               // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(0.000005, 0, 0),
+              new PIDConstants(7.0, 0, 0),
               // Translation PID constants
-              new PIDConstants(0.000005, 0,0)
+              new PIDConstants(7.0, 0, 0)
               // Rotation PID constants
           ),
           config,
@@ -575,11 +605,13 @@ SmartDashboard.putNumber("Gyro Heading", swerveDrive.getPose().getRotation().get
   }
 
   /**
-   * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0.
+   * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 180.
    */
   public void zeroGyro()
   {
     swerveDrive.zeroGyro();
+    // Set the robot to face 180 degrees after zeroing
+    resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
   }
 
   /**

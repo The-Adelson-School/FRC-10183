@@ -5,27 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "ReefTagIntake"
+            "pathName": "New New New New New New New Path"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "New New New New New Path"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ReefTagIntakeStage1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "New New New New Path"
+            "pathName": "New New New New New New Path"
           }
         }
       ]
