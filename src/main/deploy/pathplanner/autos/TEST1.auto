@@ -9,18 +9,6 @@
           "data": {
             "pathName": "Blue Right Path"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ReefTagIntake"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "New New New New New New New New New New New Path"
-          }
         }
       ]
     }
